@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import com.github.stephanenicolas.afterburner.android.sample.LogLifeCycle;
+import com.github.stephanenicolas.loglifecycle.LogLifeCycle;
 
 @LogLifeCycle
 public class MainActivity extends Activity {

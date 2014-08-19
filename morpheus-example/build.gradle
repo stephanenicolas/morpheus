@@ -9,8 +9,13 @@ buildscript {
   dependencies {
     classpath 'com.android.tools.build:gradle:0.12.2'
     classpath 'com.github.stephanenicolas.morpheus:morpheus-plugin:1.0.0-SNAPSHOT'
+    classpath 'com.github.stephanenicolas.loglifecycle:loglifecycle:1.0.0-SNAPSHOT'
   }
 }
+
+apply plugin: 'android'
+apply plugin: 'morpheus'
+
 
 repositories {
   mavenCentral()
@@ -20,10 +25,8 @@ repositories {
 }
 
 dependencies {
+  provided files("/Users/administrateur/.m2/repository/com/github/stephanenicolas/loglifecycle/loglifecycle/1.0.0-SNAPSHOT/loglifecycle-1.0.0-SNAPSHOT.jar")
 }
-
-apply plugin: 'android'
-apply plugin: 'morpheus'
 
 android {
   compileSdkVersion 20
@@ -34,9 +37,10 @@ android {
     targetCompatibility JavaVersion.VERSION_1_7
   }
 
-  buildTypes {
-    dev {
-      packageNameSuffix '.dev'
-    }
-  }
-} 
+}
+
+import com.github.stephanenicolas.loglifecycle.LogLifeCycleProcessor
+
+morpheus {
+  transformers = new LogLifeCycleProcessor()
+}
