@@ -10,6 +10,8 @@ It is related to :
 * https://github.com/darylteo/javassist-gradle-plugin
 * https://github.com/icon-Systemhaus-GmbH/javassist-maven-plugin
 
+//Give credit for logo to :
+//http://www.bigabstractpainting.com/
 
 License
 -------

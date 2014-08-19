@@ -15,3 +15,6 @@ hs_err_pid*
 .idea/
 *.iml
 local.properties
+
+#gradle
+.gradle
