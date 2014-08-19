@@ -1,5 +1,5 @@
-javassist-android-gradle-plugin
-===============================
+Morpheus
+========
 
 A gradle plugin to transform classes via javassist.
 
