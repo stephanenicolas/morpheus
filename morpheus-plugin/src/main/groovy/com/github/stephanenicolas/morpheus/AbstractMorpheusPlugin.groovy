@@ -10,11 +10,9 @@ import org.gradle.api.Task
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.compile.JavaCompile
 
-import java.io.File
-import java.util.Set
-
-abstract class AbstractMorpheusPlugin implements Plugin<Project> {
-  @Override void apply(Project project) {
+public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
+  @Override
+  public void apply(Project project) {
     def hasApp = project.plugins.withType(AppPlugin)
     def hasLib = project.plugins.withType(LibraryPlugin)
     if (!hasApp && !hasLib) {
@@ -33,6 +31,7 @@ abstract class AbstractMorpheusPlugin implements Plugin<Project> {
 
     //project.dependencies {
     //}
+    configureProject(project)
 
     variants.all { variant ->
       if (!variant.buildType.isDebuggable()) {
@@ -83,6 +82,9 @@ abstract class AbstractMorpheusPlugin implements Plugin<Project> {
         install.dependsOn(transformTask, copyTransformedTask)
       }
     }
+  }
+
+  protected void configureProject(Project project) {
   }
 
   protected abstract Class getPluginExtension()
