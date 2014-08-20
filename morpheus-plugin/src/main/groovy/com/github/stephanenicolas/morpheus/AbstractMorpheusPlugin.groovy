@@ -1,18 +1,19 @@
-package com.github.stephanenicolas.morpheus;
+package com.github.stephanenicolas.morpheus
 
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
+import com.darylteo.gradle.javassist.tasks.TransformationTask
 import javassist.build.IClassTransformer
-import org.gradle.api.Project
 import org.gradle.api.Plugin
+import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.compile.JavaCompile
-import com.darylteo.gradle.javassist.tasks.TransformationTask
-import java.util.Set
-import java.io.File
 
-class MorpheusPlugin implements Plugin<Project> {
+import java.io.File
+import java.util.Set
+
+abstract class AbstractMorpheusPlugin implements Plugin<Project> {
   @Override void apply(Project project) {
     def hasApp = project.plugins.withType(AppPlugin)
     def hasLib = project.plugins.withType(LibraryPlugin)
@@ -20,7 +21,7 @@ class MorpheusPlugin implements Plugin<Project> {
       throw new IllegalStateException("'android' or 'android-library' plugin required.")
     }
 
-    project.extensions.create("morpheus", MorpheusPluginExtension)
+    project.extensions.create(getExtension(), getPluginExtension())
 
     final def log = project.logger
     final def variants
@@ -47,7 +48,7 @@ class MorpheusPlugin implements Plugin<Project> {
         classpathSet.add(new File(fileName))
       }
 
-      for(IClassTransformer transformer : project.morpheus.transformers ) {
+      for(IClassTransformer transformer : getTransformers(project) ) {
         String transformerClassName = transformer.getClass().getSimpleName()
         String transformationDir = "${project.buildDir}/transformations/transform${transformerClassName}${variant.name.capitalize()}"
         def transformTask = "transform${transformerClassName}${variant.name.capitalize()}"
@@ -83,4 +84,10 @@ class MorpheusPlugin implements Plugin<Project> {
       }
     }
   }
+
+  protected abstract Class getPluginExtension()
+
+  protected abstract String getExtension()
+
+  public abstract IClassTransformer[] getTransformers(Project project);
 }
