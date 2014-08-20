@@ -7,6 +7,7 @@ import javassist.build.IClassTransformer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.compile.JavaCompile
 
@@ -22,6 +23,8 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
     project.extensions.create(getExtension(), getPluginExtension())
 
     final def log = project.logger
+    final String LOG_TAG = this.getClass().getName()
+
     final def variants
     if (hasApp) {
       variants = project.android.applicationVariants
@@ -29,41 +32,34 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
       variants = project.android.libraryVariants
     }
 
-    //project.dependencies {
-    //}
-    configureProject(project)
+    configure(project)
 
     variants.all { variant ->
-      if (!variant.buildType.isDebuggable()) {
-        log.debug("Skipping non-debuggable build type '${variant.buildType.name}'.")
-        return;
-      }
+      log.debug(LOG_TAG, "Transforming classes in variant '${variant.name}'.")
 
       JavaCompile javaCompile = variant.javaCompile
-      println project.android.bootClasspath.get(0).getClass().getName()
-      Set<File> classpathSet = new HashSet<>();
-      classpathSet.addAll(javaCompile.classpath.getFiles());
-      for (String fileName : project.android.bootClasspath) {
-        classpathSet.add(new File(fileName))
-      }
+      FileCollection classpathFileCollection = project.files(project.android.bootClasspath)
+      classpathFileCollection += javaCompile.classpath
 
       for(IClassTransformer transformer : getTransformers(project) ) {
         String transformerClassName = transformer.getClass().getSimpleName()
-        String transformationDir = "${project.buildDir}/transformations/transform${transformerClassName}${variant.name.capitalize()}"
+        String transformationDir = "${project.buildDir}/intermediates/transformations/transform${transformerClassName}${variant.name.capitalize()}"
+
         def transformTask = "transform${transformerClassName}${variant.name.capitalize()}"
         project.task(transformTask, type: TransformationTask) {
           description = "Transform a file using ${transformerClassName}"
           into(transformationDir)
           from ("${javaCompile.destinationDir.path}")
           transformation = transformer
-          classpath = classpathSet
+          classpath = classpathFileCollection
           outputs.upToDateWhen {
             false
           }
-
+          eachFile {
+            log.debug(LOG_TAG, "Transformed:" + it.path)
+          }
         }
 
-        println "sourceFile: " + project.tasks.getByName(transformTask).getSource()
         project.tasks.getByName(transformTask).mustRunAfter(javaCompile)
         def copyTransformedTask = "copyTransformed${transformerClassName}${variant.name.capitalize()}"
         project.task(copyTransformedTask, type: Copy) {
@@ -73,7 +69,9 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
           outputs.upToDateWhen {
             false
           }
-          eachFile { println "Copied:" + it.path }
+          eachFile {
+            log.debug(LOG_TAG, "Copied into build:" + it.path) 
+          }
         }
         project.tasks.getByName(copyTransformedTask).mustRunAfter(project.tasks.getByName(transformTask))
         Task assemble = variant.assemble
@@ -84,7 +82,7 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
     }
   }
 
-  protected void configureProject(Project project) {
+  protected void configure(Project project) {
   }
 
   protected abstract Class getPluginExtension()
