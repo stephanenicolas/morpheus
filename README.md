@@ -36,18 +36,34 @@ morpheus {
 Morpheus will then add a few tasks to your gradle android app (or lib) automatically :
 
 ```bash
-TODO
+gradle tasks --all
+
+transformMyTransformerDebug
+copyTransformedMyTransformerDebug
+...
 ```
 
+All variants of the build are enhanced to apply the transformations.
 
+### Example
+
+This repo contains an example. 
+
+Also have a look at [LogLifeCycle](https://github.com/stephanenicolas/loglifecycle) to see how to extend morpheus.
+
+### Related projects
 
 It is related to :
-* https://github.com/stephanenicolas/javassist-build-plugin-api
-* https://github.com/darylteo/javassist-gradle-plugin
-* https://github.com/icon-Systemhaus-GmbH/javassist-maven-plugin
+* [javassist-build-plugin-api](https://github.com/stephanenicolas/javassist-build-plugin-api)
+* [javassist-gradle-plugin](https://github.com/darylteo/javassist-gradle-plugin)
 
-//Give credit for logo to :
-//http://www.bigabstractpainting.com/
+A good example of morpheus capabilities can be found here : 
+* [LogLifeCycle](https://github.com/stephanenicolas/loglifecycle)
+
+Stay tuned, this is just the beginning of larger story...
+
+<!-- Give credit for logo to :
+http://www.bigabstractpainting.com/ -->
 
 License
 -------
