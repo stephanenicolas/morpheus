@@ -3,7 +3,43 @@ Morpheus
 
 A gradle plugin to transform classes via javassist.
 
-This project will be more detailed soon.
+### Usage 
+
+Morpheus can be used in 2 different ways : 
+* to use a Javassist based class(es) transformer(s)
+* to create a new gradle plugin to trigger it inside an Android project.
+
+
+### Use a Javassist based class(es) transformer(s)
+
+Add morpheus to your `build.gradle` file:
+
+```groovy
+apply plugin: 'morpheus'
+````
+
+Then configure morpheus to use one or multiple [`ClassTransformer`](https://github.com/stephanenicolas/javassist-build-plugin-api/blob/master/src/main/java/javassist/build/IClassTransformer.java):
+
+```groovy
+
+android {
+...
+}
+
+import foo.MyTransformer
+
+morpheus {
+  transformers = new MyTransformer()
+}
+```
+
+Morpheus will then add a few tasks to your gradle android app (or lib) automatically :
+
+```bash
+TODO
+```
+
+
 
 It is related to :
 * https://github.com/stephanenicolas/javassist-build-plugin-api
