@@ -41,6 +41,7 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
       FileCollection classpathFileCollection = project.files(project.android.bootClasspath)
       classpathFileCollection += javaCompile.classpath
 
+      println classpathFileCollection.getFiles()
       for(IClassTransformer transformer : getTransformers(project) ) {
         String transformerClassName = transformer.getClass().getSimpleName()
         String transformationDir = "${project.buildDir}/intermediates/transformations/transform${transformerClassName}${variant.name.capitalize()}"
@@ -48,7 +49,7 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
         def transformTask = "transform${transformerClassName}${variant.name.capitalize()}"
         project.task(transformTask, type: TransformationTask) {
           description = "Transform a file using ${transformerClassName}"
-          into(transformationDir)
+          destinationDir = project.file(transformationDir)
           from ("${javaCompile.destinationDir.path}")
           transformation = transformer
           classpath = classpathFileCollection
@@ -60,6 +61,7 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
           }
         }
 
+        println "transformTasks " +  transformTask
         project.tasks.getByName(transformTask).mustRunAfter(javaCompile)
         def copyTransformedTask = "copyTransformed${transformerClassName}${variant.name.capitalize()}"
         project.task(copyTransformedTask, type: Copy) {
@@ -70,14 +72,13 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
             false
           }
           eachFile {
-            log.debug(LOG_TAG, "Copied into build:" + it.path) 
+            log.debug(LOG_TAG, "Copied into build:" + it.path)
           }
         }
+        println "copyTransformTasks " + copyTransformedTask
         project.tasks.getByName(copyTransformedTask).mustRunAfter(project.tasks.getByName(transformTask))
-        Task assemble = variant.assemble
-        assemble.dependsOn(transformTask, copyTransformedTask)
-        Task install = variant.install
-        install.dependsOn(transformTask, copyTransformedTask)
+        variant.assemble.dependsOn(transformTask, copyTransformedTask)
+        variant.install?.dependsOn(transformTask, copyTransformedTask)
       }
     }
   }

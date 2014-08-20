@@ -29,7 +29,7 @@ logging.captureStandardOutput LogLevel.INFO
 
 modifyPom {
   project {
-    name "Javassist Gradle Android plugin"
+    name "Morpheus Gradle plugin"
     description POM_DESCRIPTION
     url POM_URL
 

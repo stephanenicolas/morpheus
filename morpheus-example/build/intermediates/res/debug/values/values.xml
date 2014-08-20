@@ -10,7 +10,7 @@
     <eat-comment />
 
     <string name="action_settings">Settings</string>
-    <string name="app_name">Afterburner-Android-Sample</string>
+    <string name="app_name">Morpheus Example</string>
     <string name="hello_world">Hello world!</string>
 
 </resources>
