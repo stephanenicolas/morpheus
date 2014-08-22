@@ -1,10 +1,10 @@
-<img src="https://raw.githubusercontent.com/stephanenicolas/morpheus/master/assets/morpheus-logo.jpg"
-width="250px" />
-
 Morpheus [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.stephanenicolas.morpheus/morpheus-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.stephanenicolas.morpheus/morpheus-plugin)
 ========
 
-A gradle plugin to transform classes via javassist.
+An Android gradle plugin to transform classes via javassist.
+
+<img src="https://raw.githubusercontent.com/stephanenicolas/morpheus/master/assets/morpheus-logo.jpg"
+width="250px" />
 
 ### Usage 
 
