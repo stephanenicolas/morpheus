@@ -1,3 +1,6 @@
+<img src="https://raw.githubusercontent.com/stephanenicolas/morpheus/master/assets/morpheus-logo.jpg"
+width="250px" />
+
 Morpheus [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.stephanenicolas.morpheus/morpheus-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.stephanenicolas.morpheus/morpheus-plugin)
 ========
 
@@ -62,8 +65,9 @@ A good example of morpheus capabilities can be found here :
 
 Stay tuned, this is just the beginning of larger story...
 
-<!-- Give credit for logo to :
-http://www.bigabstractpainting.com/ -->
+### Credits 
+
+The logo of morpheus is a painting by [H Homampour](http://www.yessy.com/homampourarts/gallery.html?i=30994)
 
 License
 -------
