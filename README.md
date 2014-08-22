@@ -1,4 +1,4 @@
-Morpheus [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.stephanenicolas,morpheus/morpheus-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.stephanenicolas.morpheus/morpheus-plugin)
+Morpheus [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.stephanenicolas.morpheus/morpheus-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.stephanenicolas.morpheus/morpheus-plugin)
 ========
 
 A gradle plugin to transform classes via javassist.
