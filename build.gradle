@@ -23,6 +23,7 @@ allprojects {
 }
 
 apply plugin: 'release'
+createReleaseTag.dependsOn uploadArchives
 
 task wrapper(type: Wrapper) {
   gradleVersion = '1.12'
