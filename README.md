@@ -9,9 +9,8 @@ width="250px" />
 ### Usage 
 
 Morpheus can be used in 2 different ways : 
-* to use a Javassist based class(es) transformer(s)
-* to create a new gradle plugin to trigger it inside an Android project.
-
+* to use a Javassist based class(es) transformer(s) via a gradle DSL
+* to create a new gradle plugin to apply to an Android project.
 
 ### Use a Javassist based class(es) transformer(s)
 
@@ -50,20 +49,20 @@ All variants of the build are enhanced to apply the transformations.
 
 ### Example
 
-This repo contains an example. 
+This repo contains an example to invoke a class transformer to an android projet.
 
-Also have a look at [LogLifeCycle](https://github.com/stephanenicolas/loglifecycle) to see how to extend morpheus.
+### Create a new gradle plugin to apply to an Android project.
+
+Here are some examples of android gradle plugins based on morpheus : 
+
+* [LogLifeCycle](https://github.com/stephanenicolas/loglifecycle) to log the life cycle of annotated activities, fragments, etc..
+* [InjectView](https://github.com/stephanenicolas/injectview) to automatically inject views and fragments into activities, fragments, views, place holder, etc. Works a la [RoboGuice](https://github.com/stephanenicolas/org.roboguice/roboguice).
 
 ### Related projects
 
 It is related to :
 * [javassist-build-plugin-api](https://github.com/stephanenicolas/javassist-build-plugin-api)
 * [javassist-gradle-plugin](https://github.com/darylteo/javassist-gradle-plugin)
-
-A good example of morpheus capabilities can be found here : 
-* [LogLifeCycle](https://github.com/stephanenicolas/loglifecycle)
-
-Stay tuned, this is just the beginning of larger story...
 
 ### Credits 
 
