@@ -56,7 +56,7 @@ This repo contains an example to invoke a class transformer to an android projet
 Here are some examples of android gradle plugins based on morpheus : 
 
 * [LogLifeCycle](https://github.com/stephanenicolas/loglifecycle) to log the life cycle of annotated activities, fragments, etc..
-* [InjectView](https://github.com/stephanenicolas/injectview) to automatically inject views and fragments into activities, fragments, views, place holder, etc. Works a la [RoboGuice](https://github.com/stephanenicolas/org.roboguice/roboguice).
+* [InjectView](https://github.com/stephanenicolas/injectview) to automatically inject views and fragments into activities, fragments, views, place holder, etc. Works a la [RoboGuice](https://github.com/roboguice/roboguice).
 
 ### Related projects
 
