@@ -6,6 +6,10 @@ An Android gradle plugin to transform classes via javassist.
 <img src="https://raw.githubusercontent.com/stephanenicolas/morpheus/master/assets/morpheus-logo.jpg"
 width="250px" />
 
+### Credits 
+The logo of morpheus is a painting by [H Homampour](http://www.yessy.com/homampourarts/gallery.html?i=30994). We use this logo with his kind and generous permission.
+
+
 ### Usage 
 
 Morpheus can be used in 2 different ways : 
@@ -63,10 +67,6 @@ Here are some examples of android gradle plugins based on morpheus :
 It is related to :
 * [javassist-build-plugin-api](https://github.com/stephanenicolas/javassist-build-plugin-api)
 * [javassist-gradle-plugin](https://github.com/darylteo/javassist-gradle-plugin)
-
-### Credits 
-
-The logo of morpheus is a painting by [H Homampour](http://www.yessy.com/homampourarts/gallery.html?i=30994)
 
 License
 -------
