@@ -2,11 +2,13 @@ buildscript {
   repositories {
     mavenCentral()
     jcenter()
+    maven { url "https://oss.sonatype.org/content/groups/public"}
   }
 
   dependencies {
     classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7'
     classpath 'com.android.tools.build:gradle:0.12.2'
+    classpath 'com.github.townsfolk:gradle-release:1.2'
   }
 }
 
@@ -20,6 +22,8 @@ allprojects {
 
   apply plugin: 'maven'
 }
+
+apply plugin: 'release'
 
 task wrapper(type: Wrapper) {
   gradleVersion = '1.12'

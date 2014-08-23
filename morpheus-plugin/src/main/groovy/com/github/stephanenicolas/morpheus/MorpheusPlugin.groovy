@@ -1,27 +1,31 @@
 package com.github.stephanenicolas.morpheus;
 
-import com.android.build.gradle.AppPlugin
-import com.android.build.gradle.LibraryPlugin
 import javassist.build.IClassTransformer
 import org.gradle.api.Project
-import org.gradle.api.Plugin
-import org.gradle.api.Task
-import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.compile.JavaCompile
-import com.darylteo.gradle.javassist.tasks.TransformationTask
-import java.util.Set
-import java.io.File
 
+/**
+ * The default morpheus plugin. Creates an extension named 'morpheus'
+ * represented by {@link MorpheusPluginExtension}.
+ * The list of transformers are provided by:
+ * <pre>
+ *   morpheus {
+ *     transformers = new T0(), new T1()
+ *   }
+ * </pre>
+ */
 class MorpheusPlugin extends AbstractMorpheusPlugin {
 
+  @Override
   public IClassTransformer[] getTransformers(Project project) {
     return project.morpheus.transformers;
   }
 
+  @Override
   protected Class getPluginExtension() {
     MorpheusPluginExtension
   }
 
+  @Override
   protected String getExtension() {
     "morpheus"
   }
