@@ -74,7 +74,7 @@ public final class JavassistUtils {
   }
 
   public static boolean isArrayList(CtField field, ClassPool classPool) throws NotFoundException {
-    return isSubType(classPool, field.getType(), ArrayList.class);
+    return isSubClass(classPool, field.getType(), ArrayList.class);
   }
 
   public static boolean isParcelableArray(CtField field, ClassPool classPool)
@@ -88,43 +88,51 @@ public final class JavassistUtils {
   }
 
   public static boolean isActivity(CtClass clazz) throws NotFoundException {
-    return isSubType(clazz.getClassPool(), clazz, Activity.class);
+    return isSubClass(clazz.getClassPool(), clazz, Activity.class);
   }
 
   public static boolean isService(CtClass clazz) throws NotFoundException {
-    return isSubType(clazz.getClassPool(), clazz, Service.class);
+    return isSubClass(clazz.getClassPool(), clazz, Service.class);
   }
 
   public static boolean isContext(CtClass clazz) throws NotFoundException {
-    return isSubType(clazz.getClassPool(), clazz, Context.class);
+    return isSubClass(clazz.getClassPool(), clazz, Context.class);
   }
 
   public static boolean isBroadCastReceiver(CtClass clazz) throws NotFoundException {
-    return isSubType(clazz.getClassPool(), clazz, BroadcastReceiver.class);
+    return isSubClass(clazz.getClassPool(), clazz, BroadcastReceiver.class);
   }
 
   public static boolean isContentProvider(CtClass clazz) throws NotFoundException {
-    return isSubType(clazz.getClassPool(), clazz, ContentProvider.class);
+    return isSubClass(clazz.getClassPool(), clazz, ContentProvider.class);
   }
 
   public static boolean isApplication(CtClass clazz) throws NotFoundException {
-    return isSubType(clazz.getClassPool(), clazz, Application.class);
+    return isSubClass(clazz.getClassPool(), clazz, Application.class);
   }
 
   public static boolean isFragment(CtClass clazz) throws NotFoundException {
-    return isSubType(clazz.getClassPool(), clazz, Fragment.class);
+    return isSubClass(clazz.getClassPool(), clazz, Fragment.class);
   }
 
   public static boolean isSupportFragment(CtClass clazz) throws NotFoundException {
-    return isSubType(clazz.getClassPool(), clazz, android.support.v4.app.Fragment.class);
+    return isSubClass(clazz.getClassPool(), clazz, android.support.v4.app.Fragment.class);
   }
 
   public static boolean isView(CtClass clazz) throws NotFoundException {
-    return isSubType(clazz.getClassPool(), clazz, View.class);
+    return isSubClass(clazz.getClassPool(), clazz, View.class);
   }
 
+  /** Direct super class*/
   public static boolean isSubType(ClassPool classPool, CtClass clazz, Class<?> superClass)
       throws NotFoundException {
     return clazz.subtypeOf(classPool.get(superClass.getName()));
   }
+
+  /** Super class*/
+  public static boolean isSubClass(ClassPool classPool, CtClass clazz, Class<?> superClass)
+      throws NotFoundException {
+    return clazz.subclassOf(classPool.get(superClass.getName()));
+  }
+
 }
