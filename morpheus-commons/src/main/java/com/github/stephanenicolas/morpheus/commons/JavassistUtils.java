@@ -10,7 +10,9 @@ import android.content.Context;
 import android.os.Parcelable;
 import android.view.View;
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.List;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
@@ -135,4 +137,15 @@ public final class JavassistUtils {
     return clazz.subclassOf(classPool.get(superClass.getName()));
   }
 
+  public static List<CtField> getAllInjectedFieldsForAnnotation(CtClass clazz,
+      Class<? extends Annotation> annotationClazz) {
+    List<CtField> result = new ArrayList<CtField>();
+    CtField[] allFields = clazz.getDeclaredFields();
+    for (CtField field : allFields) {
+      if (field.hasAnnotation(annotationClazz)) {
+        result.add(field);
+      }
+    }
+    return result;
+  }
 }

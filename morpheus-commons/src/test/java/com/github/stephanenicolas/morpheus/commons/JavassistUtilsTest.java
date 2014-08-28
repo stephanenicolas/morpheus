@@ -12,6 +12,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
@@ -234,6 +236,21 @@ public class JavassistUtilsTest {
     JavassistUtils.isArrayList(field, ClassPool.getDefault());
   }
 
+  @Test
+  public void testGetAllInjectedFieldsForAnnotation() throws Exception {
+    Class<TestClassWithAnnotatedFields> aClass =
+        TestClassWithAnnotatedFields.class;
+    List<CtField> allInjectedFieldsForAnnotation1 = JavassistUtils.getAllInjectedFieldsForAnnotation(
+        ClassPool.getDefault().get(aClass.getName()), Annotation1.class);
+    assertThat(allInjectedFieldsForAnnotation1.size(), is(1));
+    assertThat(allInjectedFieldsForAnnotation1.get(0).getName(), is("a"));
+    assertThat(allInjectedFieldsForAnnotation1.get(0).getType(), is(CtClass.intType));
+
+    List<CtField> allInjectedFieldsForAnnotation2 = JavassistUtils.getAllInjectedFieldsForAnnotation(
+        ClassPool.getDefault().get(aClass.getName()), Annotation2.class);
+    assertThat(allInjectedFieldsForAnnotation2.size(), is(0));
+  }
+
   private static class Foo {
   }
 
@@ -242,6 +259,17 @@ public class JavassistUtilsTest {
 
   private static class TestClass {
   }
+
+  private static class TestClassWithAnnotatedFields {
+    @Annotation1
+    private int a;
+    private int b;
+    private int c;
+  }
+
+  private @interface Annotation1 {}
+
+  private @interface Annotation2 {}
 
   /**
    * Verifies that a utility class is well defined.
