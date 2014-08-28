@@ -15,21 +15,24 @@ import java.util.ArrayList;
 import java.util.List;
 import javassist.ClassPool;
 import javassist.CtClass;
+import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.NotFoundException;
 
 public final class JavassistUtils {
 
-  private JavassistUtils() {}
+  private JavassistUtils() {
+  }
 
-  public static boolean isArrayOf(CtField field, CtClass typeOfArrayElements) throws NotFoundException {
+  public static boolean isArrayOf(CtField field, CtClass typeOfArrayElements)
+      throws NotFoundException {
     return field.getType().isArray() && field.getType()
         .getComponentType()
         .subtypeOf(typeOfArrayElements);
   }
 
-  public static boolean isArrayOf(CtField field, ClassPool classPool,
-      Class<?> superClass) throws NotFoundException {
+  public static boolean isArrayOf(CtField field, ClassPool classPool, Class<?> superClass)
+      throws NotFoundException {
     return field.getType().isArray() && isSubType(classPool, field.getType().getComponentType(),
         superClass);
   }
@@ -125,13 +128,13 @@ public final class JavassistUtils {
     return isSubClass(clazz.getClassPool(), clazz, View.class);
   }
 
-  /** Direct super class*/
+  /** Direct super class */
   public static boolean isSubType(ClassPool classPool, CtClass clazz, Class<?> superClass)
       throws NotFoundException {
     return clazz.subtypeOf(classPool.get(superClass.getName()));
   }
 
-  /** Super class*/
+  /** Super class */
   public static boolean isSubClass(ClassPool classPool, CtClass clazz, Class<?> superClass)
       throws NotFoundException {
     return clazz.subclassOf(classPool.get(superClass.getName()));
@@ -147,5 +150,33 @@ public final class JavassistUtils {
       }
     }
     return result;
+  }
+
+  public static List<CtConstructor> extractValidConstructors(final CtClass classToTransform,
+      CtClassFilter filter) throws NotFoundException {
+    List<CtConstructor> constructors = new ArrayList<CtConstructor>();
+    CtConstructor[] declaredConstructors = classToTransform.getDeclaredConstructors();
+    for (CtConstructor constructor : declaredConstructors) {
+      CtClass[] paramClasses = constructor.getParameterTypes();
+      if (paramClasses.length >= 1) {
+        int indexValidParam = findValidParamIndex(paramClasses, filter);
+        if (indexValidParam >= 0) {
+          constructors.add(constructor);
+        }
+      }
+    }
+    return constructors;
+  }
+
+  public static int findValidParamIndex(CtClass[] parameterTypes, CtClassFilter filter) throws NotFoundException {
+    int indexParam = 0;
+    for (CtClass paramClass : parameterTypes) {
+      if (filter.isValid(paramClass)) {
+        return indexParam;
+      } else {
+        indexParam++;
+      }
+    }
+    return -1;
   }
 }

@@ -12,7 +12,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.List;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -237,18 +236,63 @@ public class JavassistUtilsTest {
   }
 
   @Test
-  public void testGetAllInjectedFieldsForAnnotation() throws Exception {
-    Class<TestClassWithAnnotatedFields> aClass =
-        TestClassWithAnnotatedFields.class;
-    List<CtField> allInjectedFieldsForAnnotation1 = JavassistUtils.getAllInjectedFieldsForAnnotation(
-        ClassPool.getDefault().get(aClass.getName()), Annotation1.class);
+  public void testGetAllInjectedFieldsForAnnotation_WhenHasAnnotatedFields() throws Exception {
+    //GIVEN
+    Class<TestClassWithAnnotatedFields> aClass = TestClassWithAnnotatedFields.class;
+
+    //WHEN
+    List<CtField> allInjectedFieldsForAnnotation1 =
+        JavassistUtils.getAllInjectedFieldsForAnnotation(
+            ClassPool.getDefault().get(aClass.getName()), Annotation1.class);
+
+    //THEN
     assertThat(allInjectedFieldsForAnnotation1.size(), is(1));
     assertThat(allInjectedFieldsForAnnotation1.get(0).getName(), is("a"));
     assertThat(allInjectedFieldsForAnnotation1.get(0).getType(), is(CtClass.intType));
+  }
 
-    List<CtField> allInjectedFieldsForAnnotation2 = JavassistUtils.getAllInjectedFieldsForAnnotation(
-        ClassPool.getDefault().get(aClass.getName()), Annotation2.class);
+  @Test
+  public void testGetAllInjectedFieldsForAnnotation_WhenHasNoAnnotatedFields() throws Exception {
+
+    //GIVEN
+    Class<TestClassWithAnnotatedFields> aClass = TestClassWithAnnotatedFields.class;
+
+    //WHEN
+    List<CtField> allInjectedFieldsForAnnotation2 =
+        JavassistUtils.getAllInjectedFieldsForAnnotation(
+            ClassPool.getDefault().get(aClass.getName()), Annotation2.class);
+
+    //THEN
     assertThat(allInjectedFieldsForAnnotation2.size(), is(0));
+  }
+
+  @Test
+  public void testFindValidParamIndex() throws Exception {
+    //GIVEN
+    CtClass class1 = ClassPool.getDefault().get(Foo.class.getName());
+    CtClass class2 = ClassPool.getDefault().get(Bar.class.getName());
+    CtClass class3 = ClassPool.getDefault().get(TestClass.class.getName());
+    CtClass[] params = new CtClass[] { class1, class2, class3 };
+
+    CtClassFilter filterFalse = new CtClassFilter() {
+
+      @Override public boolean isValid(CtClass clazz) {
+        return false;
+      }
+    };
+
+    CtClassFilter filterFoo = new SingleCtClassFilter(Foo.class);
+    CtClassFilter filterBar = new SingleCtClassFilter(Bar.class);
+
+    //WHEN
+    int index1 = JavassistUtils.findValidParamIndex(params, filterFalse);
+    int index2 = JavassistUtils.findValidParamIndex(params, filterFoo);
+    int index3 = JavassistUtils.findValidParamIndex(params, filterBar);
+
+    //THEN
+    assertThat(index1, is(-1));
+    assertThat(index2, is(0));
+    assertThat(index3, is(1));
   }
 
   private static class Foo {
@@ -267,13 +311,16 @@ public class JavassistUtilsTest {
     private int c;
   }
 
-  private @interface Annotation1 {}
+  private @interface Annotation1 {
+  }
 
-  private @interface Annotation2 {}
+  private @interface Annotation2 {
+  }
 
   /**
    * Verifies that a utility class is well defined.
    * From http://stackoverflow.com/a/10872497/693752
+   *
    * @param clazz utility class to verify.
    */
   public static void assertUtilityClassWellDefined(final Class<?> clazz)
@@ -292,6 +339,19 @@ public class JavassistUtilsTest {
       if (!Modifier.isStatic(method.getModifiers()) && method.getDeclaringClass().equals(clazz)) {
         Assert.fail("There exists a non-static method: " + method);
       }
+    }
+  }
+
+  private static class SingleCtClassFilter implements CtClassFilter {
+
+    public CtClass clazz;
+
+    private SingleCtClassFilter(Class clazz) throws NotFoundException {
+      this.clazz = ClassPool.getDefault().get(clazz.getName());
+    }
+
+    @Override public boolean isValid(CtClass clazz) {
+      return clazz.equals(this.clazz);
     }
   }
 }
