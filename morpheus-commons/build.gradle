@@ -30,7 +30,7 @@ dependencies {
   compile "com.github.stephanenicolas.javassist:javassist-build-plugin-api:$JAVASSIST_BUILD_PLUGIN_API"
   compile "org.projectlombok:lombok:$LOMBOK_VERSION"
   compile "com.google.android:android:$ANDROID_VERSION"
-  compile "com.android.support:support-v4:$ANDROID_SUPPORT_VERSION"
+  testCompile "com.android.support:support-v4:$ANDROID_SUPPORT_VERSION"
 
   testCompile "junit:junit:$JUNIT_VERSION"
 }

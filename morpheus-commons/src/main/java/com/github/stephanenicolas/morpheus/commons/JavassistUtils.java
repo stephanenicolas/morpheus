@@ -121,7 +121,7 @@ public final class JavassistUtils {
   }
 
   public static boolean isSupportFragment(CtClass clazz) throws NotFoundException {
-    return isSubClass(clazz.getClassPool(), clazz, android.support.v4.app.Fragment.class);
+    return isSubClass(clazz.getClassPool(), clazz, "android.support.v4.app.Fragment");
   }
 
   public static boolean isView(CtClass clazz) throws NotFoundException {
@@ -138,6 +138,12 @@ public final class JavassistUtils {
   public static boolean isSubClass(ClassPool classPool, CtClass clazz, Class<?> superClass)
       throws NotFoundException {
     return clazz.subclassOf(classPool.get(superClass.getName()));
+  }
+
+  /** Super class */
+  public static boolean isSubClass(ClassPool classPool, CtClass clazz, String superClassName)
+      throws NotFoundException {
+    return clazz.subclassOf(classPool.get(superClassName));
   }
 
   public static List<CtField> getAllInjectedFieldsForAnnotation(CtClass clazz,
