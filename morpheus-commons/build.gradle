@@ -80,6 +80,9 @@ test {
   }
 }
 
+check.dependsOn test
+install.dependsOn check
+
 cobertura.coverageFormats = ['html', 'xml'] // coveralls plugin depends on xml format report
 //cobertura.auxiliaryClasspath += project.files('../injectextra-annotations/build/classes/')
 cobertura.coverageIncludes = ['.*com.github.stephanenicolas.morpheus.*']
