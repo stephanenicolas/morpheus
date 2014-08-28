@@ -28,7 +28,7 @@ public final class JavassistUtils {
 
   public static boolean isArrayOf(CtField field, ClassPool classPool,
       Class<?> superClass) throws NotFoundException {
-    return field.getType().isArray() && isSubType(classPool, field.getType().getComponentType(),
+    return field.getType().isArray() && isSubClass(classPool, field.getType().getComponentType(),
         superClass);
   }
 
