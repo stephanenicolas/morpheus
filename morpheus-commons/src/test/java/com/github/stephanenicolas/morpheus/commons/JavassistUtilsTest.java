@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.github.stephanenicolas.morpheus.commons.TestUtilityClassUtils.assertUtilityClassWellDefined;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
@@ -334,31 +335,6 @@ public class JavassistUtilsTest {
 
   private static class TestClassWithConstructors {
     public TestClassWithConstructors(Foo foo, Bar bar) {
-    }
-  }
-
-  /**
-   * Verifies that a utility class is well defined.
-   * From http://stackoverflow.com/a/10872497/693752
-   *
-   * @param clazz utility class to verify.
-   */
-  public static void assertUtilityClassWellDefined(final Class<?> clazz)
-      throws NoSuchMethodException, InvocationTargetException, InstantiationException,
-      IllegalAccessException {
-    assertTrue("Class must be final", Modifier.isFinal(clazz.getModifiers()));
-    assertEquals("There must be only one constructor", 1, clazz.getDeclaredConstructors().length);
-    final Constructor<?> constructor = clazz.getDeclaredConstructor();
-    if (constructor.isAccessible() || !Modifier.isPrivate(constructor.getModifiers())) {
-      Assert.fail("Constructor is not private");
-    }
-    constructor.setAccessible(true);
-    constructor.newInstance();
-    constructor.setAccessible(false);
-    for (final Method method : clazz.getMethods()) {
-      if (!Modifier.isStatic(method.getModifiers()) && method.getDeclaringClass().equals(clazz)) {
-        Assert.fail("There exists a non-static method: " + method);
-      }
     }
   }
 
