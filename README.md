@@ -68,6 +68,10 @@ It is related to :
 * [javassist-build-plugin-api](https://github.com/stephanenicolas/javassist-build-plugin-api)
 * [javassist-gradle-plugin](https://github.com/darylteo/javassist-gradle-plugin)
 
+### CI
+
+[![Coverage Status](https://img.shields.io/coveralls/stephanenicolas/morpheus.svg)](https://coveralls.io/r/stephanenicolas/morpheus)
+
 License
 -------
 
