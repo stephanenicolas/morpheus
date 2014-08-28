@@ -1,8 +1,3 @@
-apply plugin: 'java'
-apply plugin: 'cobertura'
-apply plugin: 'nexus'
-apply plugin: 'com.github.kt3k.coveralls'
-
 buildscript {
   repositories {
     mavenCentral()
@@ -16,6 +11,8 @@ buildscript {
   }
 }
 
+apply plugin: 'java'
+apply plugin: 'nexus'
 apply plugin: 'cobertura'
 apply plugin: 'com.github.kt3k.coveralls'
 
@@ -85,5 +82,5 @@ test {
 
 cobertura.coverageFormats = ['html', 'xml'] // coveralls plugin depends on xml format report
 //cobertura.auxiliaryClasspath += project.files('../injectextra-annotations/build/classes/')
-cobertura.coverageIncludes = ['.*com.github.stephanenicolas.morpheus.commons']
+cobertura.coverageIncludes = ['.*com.github.stephanenicolas.morpheus.*']
 
