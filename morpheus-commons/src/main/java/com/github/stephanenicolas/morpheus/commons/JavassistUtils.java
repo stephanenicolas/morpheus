@@ -121,7 +121,12 @@ public final class JavassistUtils {
   }
 
   public static boolean isSupportFragment(CtClass clazz) throws NotFoundException {
-    return isSubClass(clazz.getClassPool(), clazz, "android.support.v4.app.Fragment");
+    try {
+      return isSubClass(clazz.getClassPool(), clazz, "android.support.v4.app.Fragment");
+    } catch (NotFoundException e) {
+      //this can happen if support is not present
+      return false;
+    }
   }
 
   public static boolean isView(CtClass clazz) throws NotFoundException {
