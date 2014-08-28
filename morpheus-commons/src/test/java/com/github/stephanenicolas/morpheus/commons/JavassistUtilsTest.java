@@ -15,6 +15,7 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 import javassist.ClassPool;
 import javassist.CtClass;
+import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.NotFoundException;
 import org.junit.After;
@@ -274,25 +275,39 @@ public class JavassistUtilsTest {
     CtClass class3 = ClassPool.getDefault().get(TestClass.class.getName());
     CtClass[] params = new CtClass[] { class1, class2, class3 };
 
-    CtClassFilter filterFalse = new CtClassFilter() {
-
-      @Override public boolean isValid(CtClass clazz) {
-        return false;
-      }
-    };
-
-    CtClassFilter filterFoo = new SingleCtClassFilter(Foo.class);
-    CtClassFilter filterBar = new SingleCtClassFilter(Bar.class);
-
     //WHEN
-    int index1 = JavassistUtils.findValidParamIndex(params, filterFalse);
-    int index2 = JavassistUtils.findValidParamIndex(params, filterFoo);
-    int index3 = JavassistUtils.findValidParamIndex(params, filterBar);
+    int index1 = JavassistUtils.findValidParamIndex(params, new FalseCtClassFilter());
+    int index2 = JavassistUtils.findValidParamIndex(params, new SingleCtClassFilter(Foo.class));
+    int index3 = JavassistUtils.findValidParamIndex(params, new SingleCtClassFilter(Bar.class));
 
     //THEN
     assertThat(index1, is(-1));
     assertThat(index2, is(0));
     assertThat(index3, is(1));
+  }
+
+  @Test
+  public void testExtractValidConstructors() throws Exception {
+    //GIVEN
+    Class<TestClassWithConstructors> aClass = TestClassWithConstructors.class;
+
+    //WHEN
+    List<CtConstructor> constructorList1 =
+        JavassistUtils.extractValidConstructors(ClassPool.getDefault().get(aClass.getName()),
+            new FalseCtClassFilter());
+
+    List<CtConstructor> constructorList2 =
+        JavassistUtils.extractValidConstructors(ClassPool.getDefault().get(aClass.getName()),
+            new SingleCtClassFilter(Foo.class));
+
+    List<CtConstructor> constructorList3 =
+        JavassistUtils.extractValidConstructors(ClassPool.getDefault().get(aClass.getName()),
+            new SingleCtClassFilter(Foo.class));
+
+    //THEN
+    assertThat(constructorList1.size(), is(0));
+    assertThat(constructorList2.size(), is(1));
+    assertThat(constructorList3.size(), is(1));
   }
 
   private static class Foo {
@@ -315,6 +330,11 @@ public class JavassistUtilsTest {
   }
 
   private @interface Annotation2 {
+  }
+
+  private static class TestClassWithConstructors {
+    public TestClassWithConstructors(Foo foo, Bar bar) {
+    }
   }
 
   /**
@@ -352,6 +372,13 @@ public class JavassistUtilsTest {
 
     @Override public boolean isValid(CtClass clazz) {
       return clazz.equals(this.clazz);
+    }
+  }
+
+  private static class FalseCtClassFilter implements CtClassFilter {
+
+    @Override public boolean isValid(CtClass clazz) {
+      return false;
     }
   }
 }
