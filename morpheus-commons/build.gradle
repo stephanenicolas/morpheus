@@ -1,0 +1,81 @@
+apply plugin: 'java'
+apply plugin: 'cobertura'
+apply plugin: 'nexus'
+apply plugin: 'com.github.kt3k.coveralls'
+
+buildscript {
+  repositories {
+    mavenCentral()
+    jcenter()
+  }
+
+  dependencies {
+    classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7'
+    classpath 'net.saliman:gradle-cobertura-plugin:2.2.4'
+    classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:1.0.2'
+  }
+}
+
+repositories {
+  mavenCentral()
+  mavenLocal()
+
+  //for robolectric fork and support
+  maven {
+    url 'maven_3rd_party'
+  }
+}
+
+dependencies {
+  compile "com.github.stephanenicolas.javassist:javassist-build-plugin-api:$JAVASSIST_BUILD_PLUGIN_API"
+  compile "org.projectlombok:lombok:$LOMBOK_VERSION"
+  compile "com.google.android:android:$ANDROID_VERSION"
+  compile "com.android.support:support-v4:$ANDROID_SUPPORT_VERSION"
+
+  testCompile "junit:junit:$JUNIT_VERSION"
+}
+
+logging.captureStandardOutput LogLevel.INFO
+
+modifyPom {
+  project {
+    name "Morpheus Common Javassist Tools for Android"
+    description POM_DESCRIPTION
+    url POM_URL
+
+    scm {
+      url POM_SCM_URL
+      connection POM_SCM_CONNECTION
+      developerConnection POM_SCM_DEV_CONNECTION
+    }
+
+    licenses {
+      license {
+        name POM_LICENCE_NAME
+        url POM_LICENCE_URL
+        distribution POM_LICENCE_DIST
+      }
+    }
+
+    developers {
+      developer {
+        id POM_DEVELOPER_ID
+        name POM_DEVELOPER_NAME
+      }
+    }
+  }
+}
+
+test {
+  testLogging {
+    // set options for log level DEBUG
+    debug {
+      events "started", "skipped", "failed"
+      exceptionFormat "full"
+    }
+
+    // remove standard output/error logging from --info builds
+    // by assigning only 'failed' and 'skipped' events
+    info.events = ["started", "passed", "failed", "skipped"]
+  }
+}

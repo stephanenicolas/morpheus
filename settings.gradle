@@ -1,2 +1,3 @@
 include ':morpheus-plugin'
+include ':morpheus-commons'
 //include ':morpheus-example'
