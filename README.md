@@ -70,6 +70,7 @@ It is related to :
 
 ### CI
 
+[![Travis Build](https://travis-ci.org/stephanenicolas/morpheus.svg?branch=master)](https://travis-ci.org/stephanenicolas/morpheus)
 [![Coverage Status](https://img.shields.io/coveralls/stephanenicolas/morpheus.svg)](https://coveralls.io/r/stephanenicolas/morpheus)
 
 License
