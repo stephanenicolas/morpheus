@@ -1,3 +1,9 @@
+Version 1.0.5 (released on August 27th 2014)
+-------------
+
+Commons gets rid of support dependency.
+
+
 Version 1.0.4 (released on August 27th 2014)
 -------------
 
