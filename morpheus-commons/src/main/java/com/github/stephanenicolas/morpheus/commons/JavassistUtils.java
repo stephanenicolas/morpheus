@@ -125,9 +125,6 @@ public final class JavassistUtils {
 
   public static boolean isSubType(ClassPool classPool, CtClass clazz, Class<?> superClass)
       throws NotFoundException {
-    CtClass superclass = classPool.get(superClass.getName());
-    boolean b = clazz.subtypeOf(superclass);
-    System.out.println("Is subclass " + clazz.getName() + " of " + superClass.getName() + ": " + b);
-    return b;
+    return clazz.subtypeOf(classPool.get(superClass.getName()));
   }
 }
