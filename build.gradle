@@ -23,7 +23,7 @@ allprojects {
 }
 
 apply plugin: 'release'
-createReleaseTag.dependsOn uploadArchives
+createReleaseTag.dependsOn ':morpheus-plugin:uploadArchives', ':morpheus-commons:uploadArchives'
 
 task wrapper(type: Wrapper) {
   gradleVersion = '1.12'
