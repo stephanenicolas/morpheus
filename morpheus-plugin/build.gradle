@@ -21,8 +21,8 @@ dependencies {
   compile gradleApi()
   compile localGroovy()
   compile 'com.android.tools.build:gradle:0.12.2'
-  compile 'com.github.stephanenicolas.javassist:javassist-build-plugin-api:1.0.0'
-  compile 'com.darylteo.gradle:javassist-plugin:0.3.0'
+  compile("com.github.stephanenicolas.javassist:javassist-build-plugin-api:1.0.0")
+  compile("com.darylteo.gradle:javassist-plugin:0.4.1")
 }
 
 logging.captureStandardOutput LogLevel.INFO
