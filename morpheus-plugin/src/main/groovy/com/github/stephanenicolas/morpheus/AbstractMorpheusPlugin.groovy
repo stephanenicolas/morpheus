@@ -101,9 +101,19 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
           }
         }
         project.tasks.getByName(copyTransformedTask).mustRunAfter(project.tasks.getByName(transformTask))
+        log.debug(LOG_TAG, "Transformation installed after compile")
         variant.assemble.dependsOn(transformTask, copyTransformedTask)
         if (!hasLib) {
           variant.install?.dependsOn(transformTask, copyTransformedTask)
+        }
+
+        //support for robolectric plugin TODO add support for standard tests
+        String testTaskName = "compileTest${variant.name.capitalize()}Java"
+        project.tasks.whenTaskAdded { task ->
+          if(task.name.equals(testTaskName)) {
+            log.debug(LOG_TAG, "test task ${task.name} detected and configured for transformer ${transformerClassName}")
+            project.tasks.getByName(testTaskName).dependsOn(transformTask, copyTransformedTask)
+          }
         }
       }
     }
