@@ -66,8 +66,6 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
       FileCollection classpathFileCollection = project.files(project.android.bootClasspath)
       classpathFileCollection += javaCompile.classpath
 
-      println "Classpath " + javaCompile.classpath.asPath
-
       for(IClassTransformer transformer : getTransformers(project) ) {
         String transformerClassName = transformer.getClass().getSimpleName()
         String transformationDir = "${project.buildDir}/intermediates/transformations/transform${transformerClassName}${variant.name.capitalize()}"
