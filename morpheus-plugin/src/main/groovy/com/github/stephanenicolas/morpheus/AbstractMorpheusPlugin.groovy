@@ -9,6 +9,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
+import org.gradle.api.plugins.PluginCollection
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.compile.JavaCompile
 
@@ -34,9 +35,7 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
   public void apply(Project project) {
     def hasApp = project.plugins.withType(AppPlugin)
     def hasLib = project.plugins.withType(LibraryPlugin)
-    if (!hasApp && !hasLib) {
-      throw new IllegalStateException("'android' or 'android-library' plugin required.")
-    }
+    ensureProjectIsAndroidAppOrLib(hasApp, hasLib)
 
     def extension = getExtension()
     def pluginExtension = getPluginExtension()
@@ -114,6 +113,12 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
           }
         }
       }
+    }
+  }
+
+  protected void ensureProjectIsAndroidAppOrLib(PluginCollection<AppPlugin> hasApp, PluginCollection<LibraryPlugin> hasLib) {
+    if (!hasApp && !hasLib) {
+      throw new IllegalStateException("'android' or 'android-library' plugin required.")
     }
   }
 

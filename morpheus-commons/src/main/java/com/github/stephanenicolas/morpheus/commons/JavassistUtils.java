@@ -123,8 +123,9 @@ public final class JavassistUtils {
   public static boolean isSupportFragment(CtClass clazz) throws NotFoundException {
     try {
       return isSubClass(clazz.getClassPool(), clazz, "android.support.v4.app.Fragment");
-    } catch (NotFoundException e) {
+    } catch (Exception e) {
       //this can happen if support is not present
+      //the cause of the null pointer exception has no meaning for me !!
       return false;
     }
   }
@@ -136,7 +137,12 @@ public final class JavassistUtils {
   /** Direct super class */
   public static boolean isSubType(ClassPool classPool, CtClass clazz, Class<?> superClass)
       throws NotFoundException {
-    return clazz.subtypeOf(classPool.get(superClass.getName()));
+    try {
+      return clazz.subtypeOf(classPool.get(superClass.getName()));
+    } catch (RuntimeException e) {
+      //may happen with classpool issued from primitives
+      return false;
+    }
   }
 
   /** Super class */

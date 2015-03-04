@@ -17,6 +17,7 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtField;
+import javassist.CtPrimitiveType;
 import javassist.NotFoundException;
 import org.junit.After;
 import org.junit.Assert;
@@ -120,6 +121,12 @@ public class JavassistUtilsTest {
   public void testIsSubclass_shouldThrowExceptionWhenClassNotFound() throws NotFoundException {
     ClassPool classPool = ClassPool.getDefault();
     assertThat(JavassistUtils.isSubType(classPool, classPool.get("BadClass"), Foo.class), is(true));
+  }
+
+  @Test
+  public void testIsSubclass_shouldNotBreakWithPrimitive() throws NotFoundException {
+    ClassPool classPool = CtPrimitiveType.booleanType.getClassPool();
+    assertThat(JavassistUtils.isSubType(classPool, CtPrimitiveType.booleanType, Foo.class), is(false));
   }
 
   @Test
