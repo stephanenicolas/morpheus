@@ -69,8 +69,7 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
         String transformerClassName = transformer.getClass().getSimpleName()
         String transformationDir = "${project.buildDir}/intermediates/transformations/transform${transformerClassName}${variant.name.capitalize()}"
 
-        def transformTask = "transform${transformerClassName}${variant.name.capitalize()}"
-        project.task(transformTask, type: TransformationTask) {
+        def transformTask = project.task("transform${transformerClassName}${variant.name.capitalize()}", type: TransformationTask) {
           description = "Transform a file using ${transformerClassName}"
           destinationDir = project.file(transformationDir)
           from ("${javaCompile.destinationDir.path}")
@@ -83,10 +82,9 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
             log.debug(LOG_TAG, "Transformed:" + it.path)
           }
         }
+        javaCompile.finalizedBy transformTask
 
-        project.tasks.getByName(transformTask).mustRunAfter(javaCompile)
-        def copyTransformedTask = "copyTransformed${transformerClassName}${variant.name.capitalize()}"
-        project.task(copyTransformedTask, type: Copy) {
+        def copyTransformedTask = project.task("copyTransformed${transformerClassName}${variant.name.capitalize()}", type: Copy) {
           description = "Copy transformed file to build dir for ${transformerClassName}"
           from (transformationDir)
           into ("${javaCompile.destinationDir.path}")
@@ -97,21 +95,8 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
             log.debug(LOG_TAG, "Copied into build:" + it.path)
           }
         }
-        project.tasks.getByName(copyTransformedTask).mustRunAfter(project.tasks.getByName(transformTask))
+        transformTask.finalizedBy copyTransformedTask
         log.debug(LOG_TAG, "Transformation installed after compile")
-        variant.assemble.dependsOn(transformTask, copyTransformedTask)
-        if (!hasLib) {
-          variant.install?.dependsOn(transformTask, copyTransformedTask)
-        }
-
-        //support for robolectric plugin TODO add support for standard tests
-        String testTaskName = "compileTest${variant.name.capitalize()}Java"
-        project.tasks.whenTaskAdded { task ->
-          if(task.name.equals(testTaskName)) {
-            log.debug(LOG_TAG, "test task ${task.name} detected and configured for transformer ${transformerClassName}")
-            project.tasks.getByName(testTaskName).dependsOn(transformTask, copyTransformedTask)
-          }
-        }
       }
     }
   }
