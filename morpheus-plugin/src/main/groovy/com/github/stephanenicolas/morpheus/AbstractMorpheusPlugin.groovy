@@ -120,7 +120,9 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
    * Can be null, then no extension is created.
    * @see #getExtension()
    */
-  protected abstract Class getPluginExtension()
+  protected Class getPluginExtension() {
+    return null
+  }
 
   /**
    * @return the extension of the project that this plugin can create.
@@ -128,7 +130,9 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
    * Can be null, then no extension is created.
    * @see #getPluginExtension()
    */
-  protected abstract String getExtension()
+  protected String getExtension() {
+    return null
+  }
 
   /**
    * A list of transformer instances to be used during build.
