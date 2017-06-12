@@ -33,15 +33,23 @@ import org.gradle.api.tasks.compile.JavaCompile
 public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
   @Override
   public void apply(Project project) {
-    def hasApp = project.plugins.withType(AppPlugin)
-    def hasLib = project.plugins.withType(LibraryPlugin)
-    ensureProjectIsAndroidAppOrLib(hasApp, hasLib)
-
     def extension = getExtension()
     def pluginExtension = getPluginExtension()
     if (extension && pluginExtension) {
       project.extensions.create(extension, pluginExtension)
     }
+
+    // Variants might not have been created 
+    // until the project has been evaluated
+    project.afterEvaluate {
+      applyAfterEvaluated(project)
+    }
+  }
+
+  public void applyAfterEvaluated(Project project) {
+    def hasApp = project.plugins.withType(AppPlugin)
+    def hasLib = project.plugins.withType(LibraryPlugin)
+    ensureProjectIsAndroidAppOrLib(hasApp, hasLib)
 
     final def log = project.logger
     final String LOG_TAG = this.getClass().getName()
