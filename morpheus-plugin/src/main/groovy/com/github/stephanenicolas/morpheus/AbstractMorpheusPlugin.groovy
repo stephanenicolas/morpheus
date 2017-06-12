@@ -2,12 +2,11 @@ package com.github.stephanenicolas.morpheus
 
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
-import com.android.builder.model.Variant
+import com.android.build.gradle.api.BaseVariant
 import com.darylteo.gradle.javassist.tasks.TransformationTask
 import javassist.build.IClassTransformer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.PluginCollection
 import org.gradle.api.tasks.Copy
@@ -51,9 +50,6 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
     def hasLib = project.plugins.withType(LibraryPlugin)
     ensureProjectIsAndroidAppOrLib(hasApp, hasLib)
 
-    final def log = project.logger
-    final String LOG_TAG = this.getClass().getName()
-
     final def variants
     if (hasApp) {
       variants = project.android.applicationVariants
@@ -64,48 +60,55 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
     configure(project)
 
     variants.all { variant ->
-      if (skipVariant(variant)) {
-        return;
-      }
-      log.debug(LOG_TAG, "Transforming classes in variant '${variant.name}'.")
+      applyVariant(project, variant)
+    }
+  }
 
-      JavaCompile javaCompile = variant.javaCompile
-      FileCollection classpathFileCollection = project.files(project.android.bootClasspath)
-      classpathFileCollection += javaCompile.classpath
+  public void applyVariant(Project project, BaseVariant variant) {
+    if (skipVariant(variant)) {
+      return;
+    }
 
-      for(IClassTransformer transformer : getTransformers(project) ) {
-        String transformerClassName = transformer.getClass().getSimpleName()
-        String transformationDir = "${project.buildDir}/intermediates/transformations/transform${transformerClassName}${variant.name.capitalize()}"
+    final def log = project.logger
+    final String LOG_TAG = this.getClass().getName()
+    log.debug(LOG_TAG, "Transforming classes in variant '${variant.name}'.")
 
-        def transformTask = project.task("transform${transformerClassName}${variant.name.capitalize()}", type: TransformationTask) {
-          description = "Transform a file using ${transformerClassName}"
-          destinationDir = project.file(transformationDir)
-          from ("${javaCompile.destinationDir.path}")
-          transformation = transformer
-          classpath = classpathFileCollection
-          outputs.upToDateWhen {
-            false
-          }
-          eachFile {
-            log.debug(LOG_TAG, "Transformed:" + it.path)
-          }
+    JavaCompile javaCompile = variant.javaCompile
+    FileCollection classpathFileCollection = project.files(javaCompile.options.bootClasspath)
+    classpathFileCollection += javaCompile.classpath
+
+    for(IClassTransformer transformer : getTransformers(project) ) {
+      String transformerClassName = transformer.getClass().getSimpleName()
+      String transformationDir = "${project.buildDir}/intermediates/transformations/transform${transformerClassName}${variant.name.capitalize()}"
+
+      def transformTask = project.task("transform${transformerClassName}${variant.name.capitalize()}", type: TransformationTask) {
+        description = "Transform a file using ${transformerClassName}"
+        destinationDir = project.file(transformationDir)
+        from ("${javaCompile.destinationDir.path}")
+        transformation = transformer
+        classpath = classpathFileCollection
+        outputs.upToDateWhen {
+          false
         }
-        javaCompile.finalizedBy transformTask
-
-        def copyTransformedTask = project.task("copyTransformed${transformerClassName}${variant.name.capitalize()}", type: Copy) {
-          description = "Copy transformed file to build dir for ${transformerClassName}"
-          from (transformationDir)
-          into ("${javaCompile.destinationDir.path}")
-          outputs.upToDateWhen {
-            false
-          }
-          eachFile {
-            log.debug(LOG_TAG, "Copied into build:" + it.path)
-          }
+        eachFile {
+          log.debug(LOG_TAG, "Transformed:" + it.path)
         }
-        transformTask.finalizedBy copyTransformedTask
-        log.debug(LOG_TAG, "Transformation installed after compile")
       }
+      javaCompile.finalizedBy transformTask
+
+      def copyTransformedTask = project.task("copyTransformed${transformerClassName}${variant.name.capitalize()}", type: Copy) {
+        description = "Copy transformed file to build dir for ${transformerClassName}"
+        from (transformationDir)
+        into ("${javaCompile.destinationDir.path}")
+        outputs.upToDateWhen {
+          false
+        }
+        eachFile {
+          log.debug(LOG_TAG, "Copied into build:" + it.path)
+        }
+      }
+      transformTask.finalizedBy copyTransformedTask
+      log.debug(LOG_TAG, "Transformation installed after compile")
     }
   }
 
