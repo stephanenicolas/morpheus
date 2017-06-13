@@ -2,12 +2,11 @@ package com.github.stephanenicolas.morpheus
 
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
-import com.android.builder.model.Variant
+import com.android.build.gradle.api.BaseVariant
 import com.darylteo.gradle.javassist.tasks.TransformationTask
 import javassist.build.IClassTransformer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.PluginCollection
 import org.gradle.api.tasks.Copy
@@ -33,86 +32,81 @@ import org.gradle.api.tasks.compile.JavaCompile
 public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
   @Override
   public void apply(Project project) {
-    def hasApp = project.plugins.withType(AppPlugin)
-    def hasLib = project.plugins.withType(LibraryPlugin)
-    ensureProjectIsAndroidAppOrLib(hasApp, hasLib)
-
     def extension = getExtension()
     def pluginExtension = getPluginExtension()
     if (extension && pluginExtension) {
       project.extensions.create(extension, pluginExtension)
     }
 
-    final def log = project.logger
-    final String LOG_TAG = this.getClass().getName()
-
-    final def variants
-    if (hasApp) {
-      variants = project.android.applicationVariants
-    } else {
-      variants = project.android.libraryVariants
+    // Variants might not have been created 
+    // until the project has been evaluated
+    project.afterEvaluate {
+      applyAfterEvaluated(project)
     }
+  }
+
+  public void applyAfterEvaluated(Project project) {
+    def hasApp = project.plugins.withType(AppPlugin)
+    def hasLib = project.plugins.withType(LibraryPlugin)
+    ensureProjectIsAndroidAppOrLib(hasApp, hasLib)
 
     configure(project)
 
-    variants.all { variant ->
-      if (skipVariant(variant)) {
-        return;
-      }
-      log.debug(LOG_TAG, "Transforming classes in variant '${variant.name}'.")
+    if (hasApp) {
+      project.android.applicationVariants.all { variant -> applyVariant(project, variant) }
+    }
+    if (hasLib) {
+      project.android.libraryVariants.all { variant -> applyVariant(project, variant) }
+    }
+    project.android.testVariants.all { variant -> applyVariant(project, variant) }
+    project.android.unitTestVariants.all { variant -> applyVariant(project, variant) }
+  }
 
-      JavaCompile javaCompile = variant.javaCompile
-      FileCollection classpathFileCollection = project.files(project.android.bootClasspath)
-      classpathFileCollection += javaCompile.classpath
+  public void applyVariant(Project project, BaseVariant variant) {
+    if (skipVariant(variant)) {
+      return;
+    }
 
-      for(IClassTransformer transformer : getTransformers(project) ) {
-        String transformerClassName = transformer.getClass().getSimpleName()
-        String transformationDir = "${project.buildDir}/intermediates/transformations/transform${transformerClassName}${variant.name.capitalize()}"
+    final def log = project.logger
+    final String LOG_TAG = this.getClass().getName()
+    log.debug(LOG_TAG, "Transforming classes in variant '${variant.name}'.")
 
-        def transformTask = "transform${transformerClassName}${variant.name.capitalize()}"
-        project.task(transformTask, type: TransformationTask) {
-          description = "Transform a file using ${transformerClassName}"
-          destinationDir = project.file(transformationDir)
-          from ("${javaCompile.destinationDir.path}")
-          transformation = transformer
-          classpath = classpathFileCollection
-          outputs.upToDateWhen {
-            false
-          }
-          eachFile {
-            log.debug(LOG_TAG, "Transformed:" + it.path)
-          }
+    JavaCompile javaCompile = variant.javaCompile
+    FileCollection classpathFileCollection = project.files(javaCompile.options.bootClasspath)
+    classpathFileCollection += javaCompile.classpath
+
+    for(IClassTransformer transformer : getTransformers(project) ) {
+      String transformerClassName = transformer.getClass().getSimpleName()
+      String transformationDir = "${project.buildDir}/intermediates/transformations/transform${transformerClassName}${variant.name.capitalize()}"
+
+      def transformTask = project.task("transform${transformerClassName}${variant.name.capitalize()}", type: TransformationTask) {
+        description = "Transform a file using ${transformerClassName}"
+        destinationDir = project.file(transformationDir)
+        from ("${javaCompile.destinationDir.path}")
+        transformation = transformer
+        classpath = classpathFileCollection
+        outputs.upToDateWhen {
+          false
         }
-
-        project.tasks.getByName(transformTask).mustRunAfter(javaCompile)
-        def copyTransformedTask = "copyTransformed${transformerClassName}${variant.name.capitalize()}"
-        project.task(copyTransformedTask, type: Copy) {
-          description = "Copy transformed file to build dir for ${transformerClassName}"
-          from (transformationDir)
-          into ("${javaCompile.destinationDir.path}")
-          outputs.upToDateWhen {
-            false
-          }
-          eachFile {
-            log.debug(LOG_TAG, "Copied into build:" + it.path)
-          }
-        }
-        project.tasks.getByName(copyTransformedTask).mustRunAfter(project.tasks.getByName(transformTask))
-        log.debug(LOG_TAG, "Transformation installed after compile")
-        variant.assemble.dependsOn(transformTask, copyTransformedTask)
-        if (!hasLib) {
-          variant.install?.dependsOn(transformTask, copyTransformedTask)
-        }
-
-        //support for robolectric plugin TODO add support for standard tests
-        String testTaskName = "compileTest${variant.name.capitalize()}Java"
-        project.tasks.whenTaskAdded { task ->
-          if(task.name.equals(testTaskName)) {
-            log.debug(LOG_TAG, "test task ${task.name} detected and configured for transformer ${transformerClassName}")
-            project.tasks.getByName(testTaskName).dependsOn(transformTask, copyTransformedTask)
-          }
+        eachFile {
+          log.debug(LOG_TAG, "Transformed:" + it.path)
         }
       }
+      javaCompile.finalizedBy transformTask
+
+      def copyTransformedTask = project.task("copyTransformed${transformerClassName}${variant.name.capitalize()}", type: Copy) {
+        description = "Copy transformed file to build dir for ${transformerClassName}"
+        from (transformationDir)
+        into ("${javaCompile.destinationDir.path}")
+        outputs.upToDateWhen {
+          false
+        }
+        eachFile {
+          log.debug(LOG_TAG, "Copied into build:" + it.path)
+        }
+      }
+      transformTask.finalizedBy copyTransformedTask
+      log.debug(LOG_TAG, "Transformation installed after compile")
     }
   }
 
@@ -135,7 +129,9 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
    * Can be null, then no extension is created.
    * @see #getExtension()
    */
-  protected abstract Class getPluginExtension()
+  protected Class getPluginExtension() {
+    return null
+  }
 
   /**
    * @return the extension of the project that this plugin can create.
@@ -143,7 +139,9 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
    * Can be null, then no extension is created.
    * @see #getPluginExtension()
    */
-  protected abstract String getExtension()
+  protected String getExtension() {
+    return null
+  }
 
   /**
    * A list of transformer instances to be used during build.
