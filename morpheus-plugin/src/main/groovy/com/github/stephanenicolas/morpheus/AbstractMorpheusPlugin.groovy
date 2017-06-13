@@ -50,18 +50,16 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
     def hasLib = project.plugins.withType(LibraryPlugin)
     ensureProjectIsAndroidAppOrLib(hasApp, hasLib)
 
-    final def variants
-    if (hasApp) {
-      variants = project.android.applicationVariants
-    } else {
-      variants = project.android.libraryVariants
-    }
-
     configure(project)
 
-    variants.all { variant ->
-      applyVariant(project, variant)
+    if (hasApp) {
+      project.android.applicationVariants.all { variant -> applyVariant(project, variant) }
     }
+    if (hasLib) {
+      project.android.libraryVariants.all { variant -> applyVariant(project, variant) }
+    }
+    project.android.testVariants.all { variant -> applyVariant(project, variant) }
+    project.android.unitTestVariants.all { variant -> applyVariant(project, variant) }
   }
 
   public void applyVariant(Project project, BaseVariant variant) {
