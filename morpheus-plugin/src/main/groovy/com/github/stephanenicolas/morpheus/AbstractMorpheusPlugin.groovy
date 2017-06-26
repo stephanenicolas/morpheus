@@ -99,7 +99,7 @@ public abstract class AbstractMorpheusPlugin implements Plugin<Project> {
         }
         project.tasks.getByName(copyTransformedTask).mustRunAfter(project.tasks.getByName(transformTask))
         log.debug(LOG_TAG, "Transformation installed after compile")
-        variant.assemble.dependsOn(transformTask, copyTransformedTask)
+        project.tasks.getByName("transformClassesWithDexFor${variant.name.capitalize()}").dependsOn(transformTask, copyTransformedTask)
         if (!hasLib) {
           variant.install?.dependsOn(transformTask, copyTransformedTask)
         }
